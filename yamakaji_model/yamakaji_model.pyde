@@ -1,16 +1,18 @@
 ####################
-#山火事シミュレーション v1.5 by K.Sakurai 2020.4.29
+#山火事シミュレーション v1.6 by K.Sakurai 2020.4.29
 #Using Python Mode for Processing 3
 #
 #ウィルス流行シミュレーションを削る方向にいじったら山火事シミュレーションができました．
 #アドバンシング物理の山火事モデルを試すことができます．
+#クリックでリセットして再スタート，
 ####################
 
 import copy
+import random
 
 #パラメータ入力
 n_siz = 101 #モデルのサイズ（奇数にしてください）
-n_void = 0.5 #空隙率（初期値）
+n_void = 0.5 #空隙率（初期値，1以上はエラーになる）
 
 wait_time = 0 #待ち時間
 
@@ -19,21 +21,16 @@ cells = [[0 for i in range(n_siz)] for j in range(n_siz)]
 burned = 0
 
 def setup():
-    size(n_siz*8, n_siz*8 + 100) #1セル8x8からウィンドウサイズを導出
+    size(n_siz*8, n_siz*8 + 120) #1セル8x8からウィンドウサイズを導出
     background(255)
-    
-    #しょきか
-    initialize()
     
     #フォントじゅんび
     myFont = createFont("メイリオ", 48)
     textFont(myFont)
-
-    #表示のリフレッシュ
-    for i in range(n_siz):
-        for j in range(n_siz):
-            paint(i, j)
-
+    
+    #しょきか
+    initialize()
+    
     delay(wait_time)
                             
 def draw():
@@ -105,10 +102,10 @@ def draw():
             paint(i, j)
     
     fill(192)
-    rect(0, n_siz*8, n_siz*8, 100)
+    rect(0, n_siz*8, n_siz*8, 60)
     fill(0)
     text("Burned: " + str(burned) + "(" + str(round(burned / (n_siz * n_siz * (1 - n_void))*100, 2)) + "%)", 8, n_siz*8 + 48)
-    text(str((1 - n_void)*100) + "%trees", 8, n_siz*8 + 96)
+    
     #☆状態書き出し（更新予定）
             
    
@@ -117,7 +114,7 @@ def draw():
     #フレーム撮影する場合は下の1行のコメントアウトを外す（処理遅くなる）
     #saveFrame("frames/######.png")
 
-#セルの状態を読み取り，塗る色を決める関数
+#セルを塗る関数
 def paint(i, j):
     global cells
     
@@ -134,30 +131,49 @@ def paint(i, j):
     #セルを塗る
     rect(8*j, 8*i, 7, 7)
     
+
 #クリックしたら，配列をリセットしてinitializeから
 def mousePressed():
     global cells
+    global n_void
+    
     cells = [[0 for i in range(n_siz)] for j in range(n_siz)] 
     noLoop()
-    delay(100)
+    delay(200)
     initialize()
+
     loop()
 
 def initialize():
     
     global cells
     
+    
+    #空隙を用意（全セル数x空隙率だけ空隙セルを作成）
+    if n_void <= 0.5:
+        cells = [[0 for i in range(n_siz)] for j in range(n_siz)]
+        k = floor(n_siz * n_siz * n_void)
+        hits = random.sample(range(n_siz * n_siz - 1), k)
+        for hit in hits:
+            if hit < ((n_siz * n_siz - 1) / 2):
+                cells[hit / n_siz][hit % n_siz] = 3
+            else:
+                cells[(hit + 1) / n_siz][(hit + 1) % n_siz] = 3
+    else:
+        cells = [[3 for i in range(n_siz)] for j in range(n_siz)]
+        k = floor(n_siz * n_siz * (1 - n_void))
+        hits = random.sample(range(n_siz * n_siz - 1), k)
+        for hit in hits:
+            if hit < ((n_siz * n_siz - 1) / 2):
+                cells[hit / n_siz][hit % n_siz] = 0
+            else:
+                cells[(hit + 1) / n_siz][(hit + 1) % n_siz] = 0
+    
     #中央に種火
     cells[(n_siz - 1) / 2][(n_siz - 1) / 2] = 1
     
-    #空隙を用意（全セル数x空隙率だけ空隙セルを作成）
-    index = 0
-    while index < n_siz * n_siz * n_void:
-        hit = floor(random(0, n_siz * n_siz))
-        if cells[floor(hit / n_siz)][hit % n_siz] == 0:
-            cells[floor(hit / n_siz)][hit % n_siz] = 3
-            index += 1
-    
+
+                    
     #境目の点をつける
     stroke(0)
     for i in range(n_siz - 1):
@@ -166,3 +182,13 @@ def initialize():
 
     #以降，枠線はつけない
     noStroke()
+    
+    #最初の表示
+    for i in range(n_siz):
+        for j in range(n_siz):
+            paint(i, j)
+            
+    fill(192)        
+    rect(0, n_siz*8, n_siz*8, 120)
+    fill(0)
+    text(str((1 - n_void)*100) + "%trees", 8, n_siz*8 + 108)
