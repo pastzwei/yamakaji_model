@@ -1,5 +1,5 @@
 ####################
-#山火事シミュレーション v1.1 by K.Sakurai 2020.4.29
+#山火事シミュレーション v1.2 by K.Sakurai 2020.4.29
 #Using Python Mode for Processing 3
 #
 #ウィルス流行シミュレーションを削る方向にいじったら山火事シミュレーションができました．
@@ -10,12 +10,13 @@ import copy
 
 #パラメータ入力
 n_siz = 101 #モデルのサイズ（奇数にしてください）
-n_void = 0.5 #空隙率
+n_void = 0.6 #空隙率（初期値）
 
 wait_time = 0 #待ち時間
 
-#箱庭の用意（n_siz x n_sizの二次元配列）
+#箱庭とかの用意（n_siz x n_sizの二次元配列）
 cells = [[0 for i in range(n_siz)] for j in range(n_siz)] 
+burned = 0
 
 def setup():
     size(n_siz*8, n_siz*8) #ウィンドウサイズは808x808（1セル8x8）
@@ -26,6 +27,8 @@ def setup():
 def draw():
     
     global cells
+    global burned
+    
     cells_next = [[0 for i in range(n_siz)] for j in range(n_siz)] 
 
     
@@ -81,6 +84,16 @@ def draw():
     #全セルの処理が終わったらcells_nextをcellsに移す
     cells = copy.deepcopy(cells_next)
     del cells_next
+    
+    #燃えた数が0ならばループを止める
+    burn_now = sum(v.count(1) for v in cells) 
+    
+    if burn_now == burned:
+        noLoop()
+        #println("stopped")
+    else:
+        burned = burn_now
+    
     delay(wait_time)
     
     #フレーム撮影する場合は下の1行のコメントアウトを外す（処理遅くなる）
