@@ -1,5 +1,5 @@
 ####################
-#山火事シミュレーション v1.2.1 by K.Sakurai 2020.4.29
+#山火事シミュレーション v1.5 by K.Sakurai 2020.4.29
 #Using Python Mode for Processing 3
 #
 #ウィルス流行シミュレーションを削る方向にいじったら山火事シミュレーションができました．
@@ -10,7 +10,7 @@ import copy
 
 #パラメータ入力
 n_siz = 101 #モデルのサイズ（奇数にしてください）
-n_void = 0.6 #空隙率（初期値）
+n_void = 0.5 #空隙率（初期値）
 
 wait_time = 0 #待ち時間
 
@@ -19,10 +19,22 @@ cells = [[0 for i in range(n_siz)] for j in range(n_siz)]
 burned = 0
 
 def setup():
-    size(n_siz*8, n_siz*8) #ウィンドウサイズは808x808（1セル8x8）
+    size(n_siz*8, n_siz*8 + 100) #1セル8x8からウィンドウサイズを導出
     background(255)
     
+    #しょきか
     initialize()
+    
+    #フォントじゅんび
+    myFont = createFont("メイリオ", 48)
+    textFont(myFont)
+
+    #表示のリフレッシュ
+    for i in range(n_siz):
+        for j in range(n_siz):
+            paint(i, j)
+
+    delay(wait_time)
                             
 def draw():
     
@@ -33,14 +45,7 @@ def draw():
 
     
     #drawでは，表示をリフレッシュして次の状態をcells_nextに作る
-    for i in range(n_siz):
-        for j in range(n_siz):
-            
-            #表示のリフレッシュ
-            paint(i, j)
-            
-            #☆状態書き出し（更新予定）
-            
+
             #☆移動処理（更新予定）
 
             #☆感染処理
@@ -93,7 +98,20 @@ def draw():
         println("stopped")
     else:
         burned = burn_now
+        
+    #表示のリフレッシュ
+    for i in range(n_siz):
+        for j in range(n_siz):
+            paint(i, j)
     
+    fill(192)
+    rect(0, n_siz*8, n_siz*8, 100)
+    fill(0)
+    text("Burned: " + str(burned) + "(" + str(round(burned / (n_siz * n_siz * (1 - n_void))*100, 2)) + "%)", 8, n_siz*8 + 48)
+    text(str((1 - n_void)*100) + "%trees", 8, n_siz*8 + 96)
+    #☆状態書き出し（更新予定）
+            
+   
     delay(wait_time)
     
     #フレーム撮影する場合は下の1行のコメントアウトを外す（処理遅くなる）
