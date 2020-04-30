@@ -1,5 +1,5 @@
 ####################
-#山火事シミュレーション v1.0 by K.Sakurai 2020.4.29
+#山火事シミュレーション v1.1 by K.Sakurai 2020.4.29
 #Using Python Mode for Processing 3
 #
 #ウィルス流行シミュレーションを削る方向にいじったら山火事シミュレーションができました．
@@ -10,7 +10,7 @@ import copy
 
 #パラメータ入力
 n_siz = 101 #モデルのサイズ（奇数にしてください）
-n_void = 0.6 #空隙率
+n_void = 0.5 #空隙率
 
 wait_time = 0 #待ち時間
 
@@ -21,28 +21,8 @@ def setup():
     size(n_siz*8, n_siz*8) #ウィンドウサイズは808x808（1セル8x8）
     background(255)
     
-    global cells
-    
-    #中央に種火
-    cells[(n_siz - 1) / 2][(n_siz - 1) / 2] = 1
-    
-    #空隙を用意（全セル数x空隙率だけ空隙セルを作成）
-    index = 0
-    while index < n_siz * n_siz * n_void:
-        hit = floor(random(0, n_siz * n_siz))
-        if cells[floor(hit / n_siz)][hit % n_siz] == 0:
-            cells[floor(hit / n_siz)][hit % n_siz] = 3
-            index += 1
-    
-    #境目の点をつける
-    stroke(0)
-    for i in range(n_siz - 1):
-        for j in range(n_siz - 1):
-            point(j*8+7, i*8+7)
-
-    #以降，枠線はつけない
-    noStroke()
-                        
+    initialize()
+                            
 def draw():
     
     global cells
@@ -123,3 +103,35 @@ def paint(i, j):
     #セルを塗る
     rect(8*j, 8*i, 7, 7)
     
+#クリックしたら，配列をリセットしてinitializeから
+def mousePressed():
+    cells = [[0 for i in range(n_siz)] for j in range(n_siz)] 
+    global cells
+    noLoop()
+    delay(100)
+    initialize()
+    loop()
+
+def initialize():
+    
+    global cells
+    
+    #中央に種火
+    cells[(n_siz - 1) / 2][(n_siz - 1) / 2] = 1
+    
+    #空隙を用意（全セル数x空隙率だけ空隙セルを作成）
+    index = 0
+    while index < n_siz * n_siz * n_void:
+        hit = floor(random(0, n_siz * n_siz))
+        if cells[floor(hit / n_siz)][hit % n_siz] == 0:
+            cells[floor(hit / n_siz)][hit % n_siz] = 3
+            index += 1
+    
+    #境目の点をつける
+    stroke(0)
+    for i in range(n_siz - 1):
+        for j in range(n_siz - 1):
+            point(j*8+7, i*8+7)
+
+    #以降，枠線はつけない
+    noStroke()
