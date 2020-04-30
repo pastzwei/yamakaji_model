@@ -1,5 +1,5 @@
 ####################
-#山火事シミュレーション v1.2 by K.Sakurai 2020.4.29
+#山火事シミュレーション v1.2.1 by K.Sakurai 2020.4.29
 #Using Python Mode for Processing 3
 #
 #ウィルス流行シミュレーションを削る方向にいじったら山火事シミュレーションができました．
@@ -90,7 +90,7 @@ def draw():
     
     if burn_now == burned:
         noLoop()
-        #println("stopped")
+        println("stopped")
     else:
         burned = burn_now
     
@@ -118,8 +118,8 @@ def paint(i, j):
     
 #クリックしたら，配列をリセットしてinitializeから
 def mousePressed():
-    cells = [[0 for i in range(n_siz)] for j in range(n_siz)] 
     global cells
+    cells = [[0 for i in range(n_siz)] for j in range(n_siz)] 
     noLoop()
     delay(100)
     initialize()
