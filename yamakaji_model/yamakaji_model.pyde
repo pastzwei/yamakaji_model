@@ -104,7 +104,7 @@ def draw():
     fill(192)
     rect(0, n_siz*8, n_siz*8, 60)
     fill(0)
-    text("Burned: " + str(burned) + "(" + str(round(burned / (n_siz * n_siz * (1 - n_void))*100, 2)) + "%)", 8, n_siz*8 + 48)
+    text("Burned: " + str(burned) + "(" + str(round(burned / (n_siz * n_siz * (1.0 - n_void))*100, 2)) + "%)", 8, n_siz*8 + 48)
     
     #☆状態書き出し（更新予定）
             
@@ -148,11 +148,10 @@ def initialize():
     
     global cells
     
-    
     #空隙を用意（全セル数x空隙率だけ空隙セルを作成）
     if n_void <= 0.5:
         cells = [[0 for i in range(n_siz)] for j in range(n_siz)]
-        k = floor(n_siz * n_siz * n_void)
+        k = int(round(n_siz * n_siz * n_void))
         hits = random.sample(range(n_siz * n_siz - 1), k)
         for hit in hits:
             if hit < ((n_siz * n_siz - 1) / 2):
@@ -161,7 +160,7 @@ def initialize():
                 cells[(hit + 1) / n_siz][(hit + 1) % n_siz] = 3
     else:
         cells = [[3 for i in range(n_siz)] for j in range(n_siz)]
-        k = floor(n_siz * n_siz * (1 - n_void))
+        k = int(round(n_siz * n_siz * (1 - n_void)))
         hits = random.sample(range(n_siz * n_siz - 1), k)
         for hit in hits:
             if hit < ((n_siz * n_siz - 1) / 2):
